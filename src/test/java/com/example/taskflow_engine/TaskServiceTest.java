@@ -6,15 +6,12 @@ import com.example.taskflow_engine.dto.TaskResponse;
 import com.example.taskflow_engine.entity.Task;
 import com.example.taskflow_engine.repository.TaskRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Map;
 import java.util.UUID;
@@ -38,7 +35,7 @@ class TaskServiceTest {
 
     @Test
     void shouldCreateTask() {
-        // given
+
         CreateTaskRequest request = new CreateTaskRequest("SEND_EMAIL", Map.of("to", "test@example.com"));
 
         Task savedTask = Task.builder()
@@ -49,10 +46,10 @@ class TaskServiceTest {
                 .build();
         when(taskRepository.save(any())).thenReturn(savedTask);
 
-        // when
+
         TaskResponse response = taskService.createTask(request);
 
-        // then
+
         assertThat(response.taskType()).isEqualTo("SEND_EMAIL");
         assertThat(response.status()).isEqualTo("QUEUED");
     }
