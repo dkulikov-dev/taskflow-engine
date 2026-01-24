@@ -1,6 +1,5 @@
 package com.example.taskflow_engine.service;
 
-import com.example.taskflow_engine.entity.Task;
 import com.example.taskflow_engine.repository.TaskRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -26,6 +25,7 @@ public class TaskExecutorService {
             taskRepository.save(task);
 
             try {
+                // Имитация длительной обработки задачи (в реальном проекте заменить на асинхронную работу)
                 Thread.sleep(2000);
                 task.setStatus("COMPLETED");
             }catch (InterruptedException e){
@@ -40,6 +40,5 @@ public class TaskExecutorService {
             taskRepository.save(task);
         });
     }
-
 
 }

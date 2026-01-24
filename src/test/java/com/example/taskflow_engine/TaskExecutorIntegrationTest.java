@@ -4,7 +4,6 @@ import com.example.taskflow_engine.entity.Task;
 import com.example.taskflow_engine.repository.TaskRepository;
 import com.example.taskflow_engine.service.TaskExecutorService;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -13,10 +12,8 @@ import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
-import org.postgresql.util.PGobject;
 
 import java.time.LocalDateTime;
-import java.util.Map;
 import java.util.UUID;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
@@ -25,7 +22,7 @@ import static org.awaitility.Awaitility.await;
 
 @SpringBootTest
 @Testcontainers
-class TaskExecutorIntegrationTest {
+            class TaskExecutorIntegrationTest {
 
 
     @Container
@@ -43,6 +40,11 @@ class TaskExecutorIntegrationTest {
     @Autowired
     private ObjectMapper objectMapper;
 
+
+    /**
+     * Динамически подставляет URL, username и password от Testcontainers в Spring Boot.
+     * Без этого Spring будет использовать application.yml с localhost:5432, что приведёт к ошибке.
+     */
     @DynamicPropertySource
     static void configureProperties(DynamicPropertyRegistry registry) {
         registry.add("spring.datasource.url", postgres::getJdbcUrl);
@@ -52,10 +54,6 @@ class TaskExecutorIntegrationTest {
 
     @Test
     void shouldTransitionFromQueuedToRunningToCompleted() {
-
-
-        // given
-
 
         Task task = Task.builder()
                 .taskType("TEST")
@@ -68,10 +66,9 @@ class TaskExecutorIntegrationTest {
         task = taskRepository.save(task);
         UUID id = task.getId();
 
-        // when — вызываем НАПРЯМУЮ, не ждём @Scheduled
+        // Прямой вызов вместо ожидания @Scheduled — для быстроты и предсказуемости теста.
         taskExecutorService.executePendingTasks();
 
-        // then
         await().atMost(3, SECONDS)
                 .untilAsserted(() -> {
                     Task result = taskRepository.findById(id).orElseThrow();

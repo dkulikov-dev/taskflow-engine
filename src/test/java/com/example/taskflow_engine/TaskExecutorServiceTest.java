@@ -30,27 +30,26 @@ class TaskExecutorServiceTest {
 
     @Test
     void shouldCallSaveTwiceWhenProcessingTask(){
-        // given
+
         Task task = new Task();
         when(taskRepository.findByStatus("QUEUED")).thenReturn(List.of(task));
 
-        // when
+
         taskExecutorService.executePendingTasks();
 
-        // then проверяем, сколько раз вызван save
+        // проверяем, сколько раз вызван save
         verify(taskRepository, times(3)).save(any());
     }
 
     @Test
     void shouldNotSaveIfNoQueuedTasks() {
-        // given
+
         when(taskRepository.findByStatus("QUEUED"))
                 .thenReturn(List.of());
 
-        // when
         taskExecutorService.executePendingTasks();
 
-        // then
+
         verify(taskRepository, never()).save(any());
     }
 }

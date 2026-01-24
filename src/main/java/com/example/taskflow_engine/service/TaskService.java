@@ -6,13 +6,12 @@ import com.example.taskflow_engine.entity.Task;
 import com.example.taskflow_engine.repository.TaskRepository;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -50,5 +49,20 @@ public class TaskService {
         }catch (JsonProcessingException e) {
             throw new RuntimeException("Failed to serialize payload", e);
         }
+
+    }
+
+    public List<TaskResponse> getAllTasks() {
+        return taskRepository.findAll().stream()
+                .map(task -> new TaskResponse(
+                        task.getId(),
+                        task.getTaskType(),
+                        task.getStatus(),
+                        task.getPayload(),
+                        task.getResult(),
+                        task.getCreatedAt(),
+                        task.getUpdatedAt()
+                ))
+                .toList();
     }
 }
