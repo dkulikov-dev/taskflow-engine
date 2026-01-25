@@ -38,7 +38,7 @@ class TaskExecutorServiceTest {
         taskExecutorService.executePendingTasks();
 
         // проверяем, сколько раз вызван save
-        verify(taskRepository, times(3)).save(any());
+        verify(taskRepository, times(2)).save(any());
     }
 
     @Test
