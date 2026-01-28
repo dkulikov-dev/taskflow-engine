@@ -1,39 +1,46 @@
 # TaskFlow Engine
 
-A background task processing engine built with Spring Boot, PostgreSQL, and REST API.  
-Designed to demonstrate clean architecture, SOLID principles, and modern Java development practices.
+A lightweight background task processing engine built with **Spring Boot**, **PostgreSQL**, and **REST API**.  
+Designed to demonstrate clean architecture, test-driven development, and modern Java practices
 
-> This project uses **Rancher Desktop** (Docker-compatible container runtime) on Windows with **WSL2 + Ubuntu**, providing a fully reproducible local development environment without Docker Desktop.
+- Fully tested with **Testcontainers** (real PostgreSQL in Docker)
+- Follows Git workflow: feature branches → Pull Requests → squash merge
+- Includes structured logging, validation, and error handling
 
----
 
 ## Features
 
-- Create and manage background tasks via REST API
-- Track task status: `QUEUED`, `RUNNING`, `COMPLETED`, `FAILED`
-- Flexible task parameters using JSON payload
-- Database schema management with Flyway migrations
-- Configurable task types (e.g., `SEND_EMAIL`, `PROCESS_VIDEO`)
+- **Create tasks** via REST API with custom JSON payload
+- **Track lifecycle**: `QUEUED` → `RUNNING` → `COMPLETED` / `FAILED`
+- **List all tasks** with `GET /api/tasks`
+- **Input validation**: `taskType` must not be blank
+- **Structured logging** for debugging and monitoring
+- **Database schema managed** by Flyway (optional)
+- **Fully tested**:
+  - Unit tests with Mockito
+  - Integration tests with Testcontainers + PostgreSQL
 
----
 
 ## Tech Stack
 
 - **Java 21**
-- **Spring Boot 3.x** (Web, Data JPA, Validation, Actuator)
-- **Hibernate / JPA** for ORM
-- **PostgreSQL** as primary database
-- **Lombok** for reducing boilerplate code
-- **Flyway** for versioned database migrations
-- **Rancher Desktop** (with `dockerd` engine) for containerization
-- **WSL2 + Ubuntu** as Linux subsystem on Windows
-- **GitHub Actions** for CI/CD pipeline
+- **Spring Boot 3.5** (Web, Data JPA, Validation, Scheduling)
+- **Hibernate / JPA** (with UUID primary keys, JSONB support)
+- **PostgreSQL** (via Testcontainers in tests)
+- **Lombok** (reduces boilerplate)
+- **Flyway** (schema migrations – disabled in tests)
+- **Rancher Desktop** (Docker-compatible runtime on Windows + WSL2)
+- **Maven**, **JUnit 5**, **AssertJ**, **Awaitility**, **Testcontainers**
 
----
-## Status: Research Phase  
-Exploring state machines for support workflows.  
-Not production-ready — but each commit includes notes on design decisions.
-
+## Local Setup (Windows + WSL2)
+### Prerequisites
+- Windows 10/11 (Build 19041+)
+- WSL2 with Ubuntu
+- [Rancher Desktop](https://rancherdesktop.io/) (configured with `dockerd` runtime)
+Verify:
+  - bash
+wsl --list --verbose
+docker --version
 
 ## Local Setup (Windows with WSL2)
 
@@ -44,14 +51,44 @@ Not production-ready — but each commit includes notes on design decisions.
 - Rancher Desktop installed and configured with **`dockerd (moby)`** runtime
 
 > Verify your setup:
-> ```powershell
+> - powershell
 > wsl --list --verbose
 > docker --version
-> ```
 
 ### Steps
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/MyManuscripts/taskflow-engine.git
-   cd taskflow-engine
+1 git clone https://github.com/MyManuscripts/taskflow-engine.git
+2 cd taskflow-engine
+3 ./mvnw spring-boot:run
+
+The app starts on http://localhost:8080.
+
+### Testing
+- **Unit tests**: mock-based, fast, no database.
+- **Integration tests**: use **Testcontainers** to spin up a **real PostgreSQL instance in Docker** — no H2, full fidelity.
+
+> Note: The main application expects a local PostgreSQL server at `localhost:5432`. For development, you must run PostgreSQL separately (e.g., via Rancher Desktop or native install).
+
+Running tests:
+./mvnw clean test
+
+### Status
+Core functionality complete and tested
+Not production-ready (no auth, retries, monitoring)
+
+### Common Issues
+
+Application fails to start with "role 'taskflow' does not exist"
+
+This usually happens when:
+- A local PostgreSQL instance is already running on port `5432`
+- The application connects to the **local PostgreSQL** instead of the Docker container
+
+**Solution**:
+1. Stop any local PostgreSQL service:
+    - powershell
+   taskkill /PID <postgres-pid> /F
+
+2. Ensure docker-compose up -d starts a clean container:
+   docker-compose down -v
+   docker-compose up -d
