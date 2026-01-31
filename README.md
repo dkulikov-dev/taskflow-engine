@@ -57,7 +57,7 @@ docker --version
 
 ### Steps
 
-1 git clone https://github.com/MyManuscripts/taskflow-engine.git
+1 git clone https://github.com/dkulikov-dev/taskflow-engine.git
 2 cd taskflow-engine
 3 Start PostgreSQL container: docker-compose up -d
 4 Run the application: ./mvnw spring-boot:run
