@@ -1,7 +1,6 @@
 # TaskFlow Engine
 
-A lightweight background task processing engine built with **Spring Boot**, **PostgreSQL**, and **REST API**.  
-Designed to demonstrate clean architecture, test-driven development, and modern Java practices
+A lightweight background task processing engine built with **Spring Boot**, **PostgreSQL**, and **REST API**.
 
 - Fully tested with **Testcontainers** (real PostgreSQL in Docker)
 - Follows Git workflow: feature branches → Pull Requests → squash merge
